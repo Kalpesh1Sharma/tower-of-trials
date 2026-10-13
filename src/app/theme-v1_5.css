@@ -1,0 +1,208 @@
+/* Tower of Trials · V1.5 — cinematic world art + accessible, real DOM UI.
+   All illustrations are cropped from the project's commissioned concept mockups,
+   with baked-in titles/buttons excluded. Trial and reward logic is unchanged. */
+:root{--gold:#eecb88;--cream:#fbefdc;--night:#06121f;--faint:#c2cdd4}
+body{background:#06121f}
+.app-shell{background:transparent!important;isolation:isolate}
+.tot-world{background:#040c17}
+.tot-world-art{
+ background-image:url('/art/castle-entrance.webp');background-position:center 37%;background-size:cover;
+ opacity:.74;filter:saturate(.84) contrast(1.05)
+}
+.tot-world-veils{background:radial-gradient(ellipse 80% 44% at 50% 32%,#020b1760 0%,#03101dc5 85%),linear-gradient(180deg,#05101a8c,#03101aad 55%,#01060feb)}
+.site-header{background:#071321ec!important;backdrop-filter:blur(12px);border-bottom:1px solid #d1a76955!important;box-shadow:0 12px 35px #01050d88}
+.header-links button{color:#d5dbdd}
+.header-links button.active{color:#ffe8bb}
+.header-links button:hover{color:#ffe5b5}
+.header-progress>span{background:#071521e9;border-color:#d7b17680}
+.main-shell{width:min(1230px,calc(100% - 44px));padding-top:24px}
+.scene-eyebrow{margin-bottom:14px}
+.scene-date{color:#d9e2e8}
+
+/* A cinematic *scene*, not a split dashboard illustration. */
+.hero-card{
+ display:block!important;min-height:430px;border:1px solid #ab8a577b!important;border-radius:19px;
+ background:#06121f!important;overflow:hidden;position:relative;
+ box-shadow:0 22px 80px #000a,0 0 0 1px #f8d6a31c inset!important
+}
+.hero-card::before{inset:8px;border-color:#e3bf844b;z-index:8}
+.hero-card::after{content:'';inset:0;position:absolute;z-index:1;background:linear-gradient(90deg,#03101eea 0%,#041321c9 27%,#0413215e 62%,#04132111 100%),linear-gradient(0deg,#03111ed1 0%,transparent 44%,#0814262a);pointer-events:none}
+.hero-art{position:absolute;inset:0;min-height:0;height:100%;z-index:0;background:#081521}
+.hero-art-scene{
+ background-image:url('/art/castle-home.webp')!important;background-size:cover!important;background-position:center 44%!important;
+ filter:saturate(.99) contrast(1.04);transform:scale(1.04);transition:transform 10s ease;
+}
+.hero-card:hover .hero-art-scene{transform:scale(1.10)}
+.hero-art::after{background:linear-gradient(90deg,#06121c44,transparent 70%)}
+.hero-art-glow{position:absolute;inset:0;background:radial-gradient(circle at 64% 31%,#85ddeb13,transparent 28%);mix-blend-mode:screen;pointer-events:none;animation:worldBreath 11s ease-in-out infinite alternate}
+.hero-text{min-height:430px;max-width:670px;width:70%;padding:44px 46px 47px;position:relative;z-index:4;justify-content:center}
+.hero-text h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(45px,5.9vw,77px);font-weight:500;line-height:1.03;letter-spacing:-.053em;margin:18px 0 20px}
+.hero-text h1 em{color:#fbd38f;text-shadow:0 1px 22px #e2aa6266}
+.hero-text>p{max-width:450px;font-size:15px;color:#e1e7e8;text-shadow:0 2px 9px #000}
+.hero-chips span{background:#061628d6;border:1px solid #edcb8b74}
+.hero-story-hotspot{z-index:10;right:25px;bottom:28px;min-height:70px;min-width:105px;background:#06121bd6;border:1px solid #f5d99ac0;box-shadow:0 0 0 5px #f8d89713,0 0 25px #f3c77a47}
+.hero-art-engraving{z-index:5;left:46px;right:auto;bottom:18px;font-size:10px}
+
+/* World-based wheel altar, keeping six accessible real slices. */
+.dashboard-grid{gap:20px;margin-top:18px}
+.wheel-card,.mission-card{border-radius:19px!important;border:1px solid #bca06e70!important;box-shadow:0 25px 70px #020913ae,0 0 0 1px #f5daac16 inset!important}
+.wheel-card{background:linear-gradient(180deg,#0b1b29d7 0%,#06131fe9 100%),url('/art/hall-interior.webp') center 25%/cover no-repeat!important;overflow:hidden}
+.wheel-card::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,#08152377,#081523d9 72%,#06111bf0),radial-gradient(circle at 50% 60%,#d9a35d10,transparent 48%);pointer-events:none}
+.wheel-card::after,.mission-card::after{inset:7px;border-color:#daba8240;z-index:0}
+.wheel-card>* ,.mission-card>*{position:relative;z-index:1}
+.wheel-card .section-top h2,.mission-card .section-top h2{font-family:Georgia,serif;color:#fdf1dd;font-size:clamp(24px,2.4vw,32px)!important}
+.wheel-area{height:346px}
+.wheel-area::before{background:radial-gradient(circle,#e3ba6f2e 0%,#b9dce00a 48%,transparent 71%);box-shadow:0 0 0 14px #e1ae6312,0 0 0 30px #e5b7750a;animation:altarPulse 6s ease-in-out infinite}
+.wheel{background:conic-gradient(from -30deg,#6d4e88 0deg 60deg,#396a74 60deg 120deg,#596d4c 120deg 180deg,#825f57 180deg 240deg,#755f89 240deg 300deg,#355d7a 300deg 360deg)!important;border:9px solid #d9b477;outline:2px solid #e8d0a2;box-shadow:0 0 0 8px #101d2c,0 0 36px #efc98549,0 24px 45px #020b15ea}
+.wheel-segment-label{color:#fff0d8!important}
+.wheel-hub{background:radial-gradient(circle,#405265,#102132 75%)}
+.altar-torch{position:absolute;top:56%;width:16px;height:44px;border-radius:7px 7px 4px 4px;border:1px solid #caa26a;background:linear-gradient(90deg,#483923,#b8904d,#41301e);box-shadow:0 5px 18px #000a;z-index:2}
+.altar-torch::before{content:'';position:absolute;left:50%;top:-30px;transform:translateX(-50%);width:19px;height:34px;border-radius:90% 12% 70% 40%;background:radial-gradient(circle at 45% 68%,#fff1b3 6%,#edb452 40%,#e97a3e 66%,transparent 76%);filter:drop-shadow(0 0 10px #f7a957);animation:flameBreath 2.5s ease-in-out infinite alternate}
+.altar-torch-left{left:3%}.altar-torch-right{right:3%}
+.wheel-pointer{z-index:5}
+.action-button{font-family:Georgia,serif;font-weight:700;font-size:15px;letter-spacing:.04em;border-radius:11px!important;background:linear-gradient(120deg,#ffe6ad,#c99554)!important;box-shadow:0 0 24px #e8b06225,0 10px 18px #0007}
+.action-button:hover{filter:brightness(1.08)}
+.mission-card{background:linear-gradient(154deg,#10243ae9,#071522ed 70%)!important}
+.mission-row{border-color:#bba57129;transition:background .2s,padding .2s}
+.mission-row:hover{background:#c9aa7111;padding-inline:6px}
+.mission-progress div{background:linear-gradient(90deg,#a2783f,#f6d28f)}
+.reward-strip{background:#081725c9!important;border-color:#eac78b51!important}
+.bottom-band{border:1px solid #c2a6755a!important;background:linear-gradient(100deg,#101e2de6,#0a1724e9)!important}
+
+/* Hall and Chronicle have their own world, not plain title blocks. */
+.library-page{padding-top:4px}
+.environment-banner{position:relative;min-height:298px;overflow:hidden;border:1px solid #ad8f627a;border-radius:19px;box-shadow:0 20px 55px #020913b3;background:#081525;margin-bottom:27px}
+.environment-banner-art{position:absolute;inset:0;background-size:cover;background-position:center;filter:contrast(1.06) saturate(1.07)}
+.practice-banner .environment-banner-art{background-image:url('/art/hall-interior.webp');background-position:center 47%}
+.chronicle-banner .environment-banner-art{background-image:url('/art/chronicle-world.webp');background-position:center 46%}
+.environment-banner::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,#03101de8 0%,#051522b4 39%,#04152338 90%),linear-gradient(0deg,#041220b9,transparent 70%)}
+.environment-banner::after{content:'';position:absolute;inset:8px;z-index:2;border:1px solid #d7b67955;border-radius:13px;pointer-events:none}
+.environment-banner-copy{position:relative;z-index:3;max-width:620px;padding:48px 45px;display:flex;flex-direction:column;justify-content:center;min-height:298px}
+.environment-banner h1{font-family:Georgia,serif;font-size:clamp(34px,4.6vw,61px);line-height:1.02;letter-spacing:-.04em;color:#fff1d9;margin:8px 0 12px}
+.environment-banner .page-intro{font-size:15px;line-height:1.55;color:#e2e8e8;max-width:410px}
+.game-collection{gap:19px}
+.game-tile{border:1px solid #a88c5f8c!important;background:linear-gradient(160deg,#0e2234f1,#071522f7)!important;overflow:hidden;position:relative;padding:0 19px 20px!important;min-height:320px;border-radius:16px;transition:transform .25s,border-color .25s,box-shadow .25s}
+.game-tile:hover{transform:translateY(-5px);border-color:#f6d092!important;box-shadow:0 17px 49px #000b,0 0 28px #d19d521f!important}
+.game-tile-art{height:142px;margin:0 -19px 0;background-size:cover;background-position:center 45%;box-shadow:inset 0 -28px 25px #061522;border-bottom:1px solid #c79f6352;filter:saturate(1.06)}
+.game-tile-header{margin-top:-23px;position:relative;z-index:2;align-items:center}
+.game-tile-icon{width:49px;height:49px;display:grid;place-items:center;background:radial-gradient(circle,#314c62,#071522 80%);border:1px solid #e7ba75!important;border-radius:50%!important;font-size:27px;color:#fbe2b0;box-shadow:0 4px 13px #02070fac,0 0 19px #dbbd7e37}
+.game-tile .skill{font-size:10px;background:#06121cdb;border:1px solid #caa46d61;color:#e9c88e;padding:5px 7px;border-radius:7px}
+.game-tile h2{font-family:Georgia,serif;font-size:25px;margin:12px 0 7px;color:#ffe6bd}
+.game-tile p{color:#c8d9e1;line-height:1.45;min-height:43px}
+.game-tile .tile-button{border:1px solid #d9b275;background:linear-gradient(120deg,#243a4c,#142433);color:#ffe7b5;border-radius:8px;font-weight:700;min-height:44px;transition:background .2s}
+.game-tile .tile-button:hover{background:#354d60}
+.story-page .replay-entrance{margin:0 0 21px;border:1px solid #d1ac7190;border-radius:10px;padding:12px 16px;background:#081827db;color:#ffe2af}
+.story-layout{gap:21px}
+.story-list{gap:12px}
+.chapter-select{position:relative;padding:0 17px 15px;overflow:hidden;border-color:#a2865878!important;background:#071725ee!important;min-height:156px}
+.chapter-thumbnail{display:block;width:calc(100% + 34px);margin:0 -17px 11px;height:65px;background:url('/art/chronicle-world.webp') center 48% / cover no-repeat;filter:saturate(.8);opacity:.93;border-bottom:1px solid #d4b47c45}
+.chapter-select:nth-child(2) .chapter-thumbnail{background-image:url('/art/hall-interior.webp')}
+.chapter-select:nth-child(3) .chapter-thumbnail{background-image:url('/art/trial-circuit.webp')}
+.chapter-select:nth-child(4) .chapter-thumbnail{background-image:url('/art/castle-home.webp')}
+.chapter-select strong{font-family:Georgia,serif;color:#f4e1bb;font-size:17px}
+.chapter-select small{color:#c1cad2}
+.chapter-select.selected{box-shadow:0 0 24px #e7c2831c;background:#122338ed!important;border-color:#edc787!important}
+.chapter-select:disabled{opacity:.58}
+.story-content{position:relative;overflow:hidden;background:linear-gradient(140deg,#152a37f4,#111f2bed)!important;min-height:456px;border:1px solid #bea2767d!important;border-radius:17px;padding:40px 35px;box-shadow:0 20px 60px #0009}
+.story-content::before{content:'';position:absolute;inset:8px;border:1px solid #dcc08e38;border-radius:12px;pointer-events:none}
+.story-content::after{content:'';position:absolute;bottom:-100px;right:-110px;width:370px;height:370px;background:radial-gradient(circle,#d5b98412,transparent 70%);pointer-events:none}
+.story-paper-seal{position:absolute;right:30px;top:19px;font-size:42px;color:#edc88a7a}
+.story-content h2{color:#f8dfb2;font-family:Georgia,serif;font-size:35px}
+.chronicle-story{font-family:Georgia,serif;font-size:clamp(21px,2.3vw,29px)!important;line-height:1.6!important;color:#f8e7c9!important}
+.story-emblem{font-size:47px;color:#f7d698;opacity:.88}
+
+/* Trial experience uses the same stone-and-lantern world. */
+.trial-page{position:relative;z-index:2}
+.trial-heading{padding:16px 18px;border:1px solid #9b815f77;background:linear-gradient(130deg,#13283be8,#071625e8),url('/art/hall-interior.webp') center/cover;border-radius:17px;box-shadow:0 14px 38px #0008}
+.trial-heading h1{font-family:Georgia,serif;color:#f7dfb5}
+.game-panel{background:linear-gradient(155deg,#101e30ed,#071523f1)!important;border-color:#c39c6877!important;box-shadow:0 25px 60px #0009;border-radius:16px!important}
+.memory-cell,.observation-cell,.number-cell,.circuit-cell{box-shadow:inset 0 1px #e8ce9630;transition:filter .15s,transform .15s}
+.memory-cell:active,.observation-cell:active,.number-cell:active,.circuit-cell:active{transform:scale(.965)}
+.ending-panel{background:linear-gradient(152deg,#1c354be9,#071522f5),url('/art/castle-home.webp') center/cover!important;border-color:#edcc91!important;box-shadow:0 0 80px #eec7892d,0 26px 75px #000b}
+.ending-fragment{background:#071522a1;border-radius:7px}
+@keyframes worldBreath{from{opacity:.55}to{opacity:1}}
+@keyframes altarPulse{0%,100%{opacity:.64;transform:scale(.988)}50%{opacity:1;transform:scale(1.022)}}
+@keyframes flameBreath{from{transform:translateX(-50%) scale(.9) rotate(-3deg)}to{transform:translateX(-50%) scale(1.09) rotate(3deg)}}
+
+/* Storybook entrance: world and gates are independent layers. */
+.arrival{background:#020811}
+.arrival-scene{background-image:url('/art/castle-entrance.webp')!important;background-position:center 45%;background-size:cover;filter:saturate(1.1) contrast(1.07)}
+.arrival-vignette{background:radial-gradient(circle at 50% 46%,#06152212,#0207108f 95%),linear-gradient(180deg,#01061348,#02071072 45%,#010611df 100%)}
+.arrival-door{background:linear-gradient(90deg,#101e2a,#1c3042 12%,#0c1929 84%,#16293d),repeating-linear-gradient(0deg,#18293b 0 25px,#0c1928 25px 30px);animation-delay:.3s}
+.arrival-door::before{border:5px ridge #a58b6566;background:repeating-linear-gradient(90deg,#24384a52 0 18px,#0b1a295c 18px 27px)}
+.arrival-copy{width:min(760px,calc(100% - 30px));padding:24px 20px 100px}
+.arrival-kicker{letter-spacing:.24em}
+.arrival-copy h1{font-size:clamp(44px,7vw,86px);font-family:Georgia,serif;line-height:1.0;text-shadow:0 5px 34px #000}
+.arrival-copy h1 em{font-size:.61em;display:inline-block;font-weight:400;color:#f2cb84}
+.arrival-copy>p:last-of-type{font-family:Georgia,serif;font-size:clamp(14px,2vw,19px)}
+.arrival-skip{bottom:28px;left:50%;right:auto;transform:translateX(-50%);width:min(340px,calc(100vw - 32px));font-family:Georgia,serif;font-size:17px;color:#fceac8;border-color:#f3cc8bc7;background:linear-gradient(130deg,#112537ea,#081524ee);box-shadow:0 0 29px #f2bf6d47;text-align:center;letter-spacing:.04em}
+.arrival-skip:hover{background:#244054ec;box-shadow:0 0 40px #eac67a66}
+
+@media(max-width:820px){
+ .hero-text{padding:32px;max-width:600px;width:75%}
+ .hero-card,.hero-text{min-height:360px}
+ .hero-text h1{font-size:clamp(40px,6.5vw,66px)}
+ .environment-banner,.environment-banner-copy{min-height:244px}
+ .environment-banner-copy{padding:30px}
+ .altar-torch-left{left:2%}.altar-torch-right{right:2%}
+}
+@media(max-width:560px){
+ .main-shell{width:calc(100% - 22px);padding-top:13px}
+ .site-header{padding:11px 12px 0}
+ .scene-eyebrow{font-size:9px}
+ .hero-card{order:1!important;min-height:207px!important;border-radius:14px}
+ .hero-text{padding:21px 12px 20px 17px;min-height:207px;width:85%;max-width:none;justify-content:flex-end}
+ .hero-text h1{font-size:clamp(28px,8.4vw,37px);margin:8px 0 9px;line-height:1.03}
+ .hero-text h1 em{display:block}
+ .hero-text>p{font-size:11px;line-height:1.43;max-width:215px;-webkit-line-clamp:3}
+ .hero-text .mini-label{font-size:9px}
+ .hero-art{min-height:0;height:100%;width:100%}
+ .hero-art-scene{background-size:cover!important;background-position:55% 38%!important}
+ .hero-card::after{background:linear-gradient(90deg,#03101df0 0%,#041320aa 44%,#04132005 100%),linear-gradient(0deg,#03111ecc,transparent 65%)}
+ .hero-story-hotspot{right:13px;bottom:13px;min-width:44px;min-height:44px;height:44px;width:44px;padding:6px;z-index:10}
+ .hero-art-engraving{display:none}
+ .home-screen .scene-eyebrow{order:0!important}
+ .home-screen .wheel-card{order:2!important}
+ .home-screen .mission-card{order:3!important}
+ .home-screen .bottom-band{order:4!important}
+ .wheel-card,.mission-card{padding:16px!important;border-radius:14px!important}
+ .wheel-card .section-top h2,.mission-card .section-top h2{font-size:24px!important}
+ .wheel-area{height:259px}
+ .wheel{width:min(232px,100%);--label-shift:-69px}
+ .wheel-area::before{width:246px}
+ .altar-torch{height:29px;width:10px;top:66%}
+ .altar-torch::before{width:14px;height:27px;top:-22px}
+ .altar-torch-left{left:0}.altar-torch-right{right:0}
+ .wheel-segment-label small{font-size:10px}
+ .environment-banner{min-height:200px;border-radius:14px;margin-bottom:17px}
+ .environment-banner-copy{min-height:200px;padding:24px 19px;width:100%}
+ .environment-banner h1{font-size:clamp(32px,9vw,40px)}
+ .environment-banner .page-intro{font-size:12px;max-width:250px}
+ .practice-banner .environment-banner-art{background-position:51% center}
+ .story-page .environment-banner-art{background-position:58% center}
+ .game-collection{gap:13px}
+ .game-tile{min-height:295px;padding:0 16px 17px!important}
+ .game-tile-art{height:134px;margin:0 -16px 0}
+ .game-tile h2{font-size:23px}
+ .game-tile p{min-height:37px}
+ .chapter-select{padding:0 10px 12px;min-height:140px}
+ .chapter-thumbnail{margin:0 -10px 8px;width:calc(100% + 20px);height:56px}
+ .chapter-select strong{font-size:14px}
+ .story-content{padding:30px 20px;min-height:360px}
+ .story-content h2{font-size:30px}
+ .chronicle-story{font-size:19px!important}
+ .arrival-copy h1{font-size:clamp(44px,13vw,60px)}
+ .arrival-copy{padding-bottom:125px}
+ .arrival-skip{bottom:21px}
+}
+@media(max-width:360px){
+ .hero-card,.hero-text{min-height:194px!important}
+ .hero-text h1{font-size:29px}
+ .hero-text>p{max-width:190px}
+ .wheel-area{height:244px}
+ .wheel{width:min(223px,100%)}
+ .wheel-area::before{width:232px}
+}
+@media(prefers-reduced-motion:reduce){
+ .hero-art-scene,.hero-art-glow,.altar-torch::before{animation:none!important;transition:none!important}
+}

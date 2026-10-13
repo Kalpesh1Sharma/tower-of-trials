@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+ <defs>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#061021"/><stop offset=".45" stop-color="#172742"/><stop offset=".76" stop-color="#253d4b"/><stop offset="1" stop-color="#0a1623"/></linearGradient>
+  <radialGradient id="halo"><stop stop-color="#b8c8d7" stop-opacity=".32"/><stop offset=".42" stop-color="#b8bfd6" stop-opacity=".08"/><stop offset="1" stop-color="#a4b5da" stop-opacity="0"/></radialGradient>
+  <radialGradient id="moon"><stop stop-color="#fff3d4"/><stop offset=".8" stop-color="#e5d8bb"/><stop offset="1" stop-color="#a7afbf"/></radialGradient>
+  <linearGradient id="rock" x1="0" y1="0" x2="0.45" y2="1"><stop stop-color="#293c48"/><stop offset=".55" stop-color="#111e30"/><stop offset="1" stop-color="#07111c"/></linearGradient>
+  <linearGradient id="stone" x1="0" y1="0" x2="1" y2=".4"><stop stop-color="#162638"/><stop offset=".36" stop-color="#324454"/><stop offset=".63" stop-color="#1f3141"/><stop offset="1" stop-color="#0b1828"/></linearGradient>
+  <linearGradient id="facade" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#101e2c"/><stop offset=".4" stop-color="#3d4e5a"/><stop offset=".7" stop-color="#263a49"/><stop offset="1" stop-color="#0b1a28"/></linearGradient>
+  <linearGradient id="roof" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#273e50"/><stop offset=".55" stop-color="#122438"/><stop offset="1" stop-color="#081622"/></linearGradient>
+  <radialGradient id="light"><stop stop-color="#ffe6ae" stop-opacity=".95"/><stop offset=".2" stop-color="#f3cb79" stop-opacity=".38"/><stop offset="1" stop-color="#e0a44f" stop-opacity="0"/></radialGradient>
+  <linearGradient id="mist" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#7d9db0" stop-opacity="0"/><stop offset="1" stop-color="#a7bec9" stop-opacity=".26"/></linearGradient>
+  <pattern id="bricks" width="80" height="37" patternUnits="userSpaceOnUse"><path d="M0 36.5H80M40 0V17M0 18H80M0 19V35M80 19V35" fill="none" stroke="#95a6a9" stroke-opacity=".15" stroke-width="1.7"/></pattern>
+  <pattern id="windows" width="90" height="90" patternUnits="userSpaceOnUse"><path d="M31 68V38Q45 19 59 38V68Z" fill="#edbf73" opacity=".8"/><path d="M31 68V38Q45 19 59 38V68Z" fill="none" stroke="#111927" stroke-width="8"/><path d="M45 27V67" stroke="#253846" stroke-width="3"/></pattern>
+  <filter id="blur"><feGaussianBlur stdDeviation="28"/></filter>
+  <filter id="soft"><feGaussianBlur stdDeviation="7"/></filter>
+ </defs>
+ <rect width="1600" height="1000" fill="url(#sky)"/>
+ <ellipse cx="960" cy="365" rx="650" ry="560" fill="url(#halo)"/>
+ <g fill="#dbe5e5" opacity=".65">
+  <circle cx="132" cy="115" r="1.7"/><circle cx="280" cy="222" r="1"/><circle cx="340" cy="76" r="1.4"/><circle cx="496" cy="137" r="1"/><circle cx="619" cy="69" r="1.7"/><circle cx="794" cy="171" r="1.1"/><circle cx="1062" cy="101" r="1"/><circle cx="1184" cy="227" r="1.7"/><circle cx="1422" cy="91" r="1.1"/><circle cx="1550" cy="196" r="1.3"/><circle cx="1233" cy="53" r="1"/><circle cx="78" cy="290" r="1.2"/>
+ </g>
+ <circle cx="1070" cy="225" r="180" fill="url(#light)" opacity=".13"/>
+ <circle cx="1070" cy="225" r="110" fill="url(#moon)"/>
+ <circle cx="1047" cy="197" r="15" fill="#c9c4ba" opacity=".28"/><circle cx="1118" cy="255" r="25" fill="#c9c4ba" opacity=".23"/><circle cx="1025" cy="253" r="10" fill="#bfbeb4" opacity=".2"/>
+ <path d="M0 575L95 482L190 530L332 368L466 526L554 447L632 529L732 419L861 555L1012 466L1135 544L1268 376L1450 539L1600 445V1000H0Z" fill="#253a4b" opacity=".66"/>
+ <path d="M0 671L148 535L291 615L434 480L597 615L729 538L852 627L996 520L1130 593L1312 477L1461 612L1600 540V1000H0Z" fill="#142839" opacity=".85"/>
+ <path d="M-20 805L133 716L260 735L382 627L548 711L662 648L780 684L866 634L984 703L1118 664L1245 723L1380 636L1630 768V1000H-20Z" fill="#0f1f30"/>
+ <!-- Cliff supporting the tower -->
+ <path d="M389 996L453 800L518 736L573 725L620 651L964 648L1009 721L1088 753L1190 1000Z" fill="url(#rock)"/>
+ <path d="M546 731L493 870L518 994M614 684L602 824L654 1000M992 707L1026 855L1078 1000M851 742L865 911L899 1000" fill="none" stroke="#52616a" stroke-width="7" opacity=".22"/>
+ <path d="M370 995L502 824L657 839L790 790L945 843L1149 996" fill="none" stroke="#2a404d" stroke-width="42" opacity=".65"/>
+ <!-- silhouette turrets rear -->
+ <g opacity=".88">
+  <path d="M470 599h82v172h-82zM483 533h56v76h-56z" fill="url(#facade)"/><path d="M462 543l49-77 49 77z" fill="url(#roof)"/>
+  <path d="M1050 566h87v205h-87zM1061 497h65v77h-65z" fill="url(#facade)"/><path d="M1041 513l53-89 52 89z" fill="url(#roof)"/>
+ </g>
+ <!-- main castle battlements -->
+ <path d="M530 615H1074V775H530Z" fill="url(#stone)" stroke="#566576" stroke-width="4"/>
+ <path d="M530 615H1074V775H530Z" fill="url(#bricks)"/>
+ <path d="M526 617v-34h38v25h22v-25h35v25h22v-25h35v25h22v-25h35v25h22v-25h35v25h22v-25h35v25h22v-25h35v25h22v-25h35v25h23v-25h38v34z" fill="#304457" stroke="#0b1828" stroke-width="4"/>
+ <path d="M554 660H1040V744H554Z" fill="url(#windows)" opacity=".78"/>
+ <!-- flanking towers -->
+ <g>
+  <rect x="533" y="487" width="115" height="295" fill="url(#facade)" stroke="#0b1728" stroke-width="5"/><rect x="541" y="535" width="101" height="240" fill="url(#bricks)"/>
+  <path d="M515 505L590 381L665 505Z" fill="url(#roof)" stroke="#536475" stroke-width="5"/>
+  <path d="M582 381V350" stroke="#8192a2" stroke-width="6"/><path d="M583 344l39 13-39 16z" fill="#c19d63"/>
+  <path d="M575 572q16-26 32 0v58h-32z" fill="#e9bd72" stroke="#172536" stroke-width="8"/><path d="M576 683q16-26 32 0v49h-32z" fill="#e9bd72" stroke="#172536" stroke-width="8"/>
+  <rect x="946" y="457" width="122" height="326" fill="url(#facade)" stroke="#0b1728" stroke-width="5"/><rect x="952" y="513" width="110" height="264" fill="url(#bricks)"/>
+  <path d="M928 478L1007 343L1087 478Z" fill="url(#roof)" stroke="#536475" stroke-width="5"/>
+  <path d="M1007 342v-36" stroke="#6f8793" stroke-width="6"/><path d="M1008 308l37 15-37 14z" fill="#caa96f"/>
+  <path d="M989 542q18-26 36 0v74h-36z" fill="#f1c97d" stroke="#172536" stroke-width="9"/><path d="M989 667q18-26 36 0v67h-36z" fill="#f1c97d" stroke="#172536" stroke-width="9"/>
+ </g>
+ <!-- taller central tower -->
+ <rect x="704" y="375" width="193" height="397" fill="url(#facade)" stroke="#0d1928" stroke-width="6"/>
+ <rect x="714" y="404" width="174" height="355" fill="url(#bricks)"/>
+ <path d="M701 393L800 233L900 393Z" fill="url(#roof)" stroke="#627582" stroke-width="6"/>
+ <path d="M799 232v-48" stroke="#8994a1" stroke-width="8"/><path d="M800 184l58 22-58 18z" fill="#d9ba7a"/>
+ <rect x="767" y="430" width="64" height="110" rx="30" fill="#152535" stroke="#445768" stroke-width="9"/>
+ <path d="M788 453q12-20 24 0v64h-24z" fill="#f4d190"/><path d="M800 439v79" stroke="#263649" stroke-width="5"/>
+ <circle cx="800" cy="594" r="59" fill="#142436" stroke="#637d86" stroke-width="9"/><circle cx="800" cy="594" r="47" fill="#223548" stroke="#d7b679" stroke-width="3"/>
+ <path d="M800 549l8 35 36 10-36 9-8 36-9-36-36-9 36-10z" fill="#eed092"/>
+ <path d="M800 564l5 26 26 4-26 6-5 25-6-25-26-6 26-4z" fill="#fff2cb" opacity=".55"/>
+ <!-- doorway light -->
+ <path d="M744 780v-67q56-80 112 0v67z" fill="#07121e" stroke="#576d74" stroke-width="9"/>
+ <path d="M764 784v-66q36-57 73 0v66z" fill="#d9ba76" opacity=".78"/>
+ <ellipse cx="802" cy="790" rx="190" ry="75" fill="url(#light)" opacity=".53"/>
+ <!-- foreground path -->
+ <path d="M742 802L864 802L1070 1000H482Z" fill="#34404a" opacity=".52"/>
+ <path d="M759 819L841 819M716 856H887M665 917H951" stroke="#617581" stroke-width="4" opacity=".24"/>
+ <!-- foreground silhouettes framing scene -->
+ <path d="M0 610l89-48 44 81 88-23 77 380H0z" fill="#0a1827"/><path d="M1600 596l-85-52-50 112-110-39-77 383h322z" fill="#081623"/>
+ <g fill="#101f2e"><path d="M140 942L190 675L238 945Z"/><path d="M1300 941l57-302 61 306z"/><path d="M215 959l34-196 36 196z"/><path d="M1265 960l32-182 38 185z"/></g>
+ <rect width="1600" height="1000" fill="url(#mist)"/>
+ <path d="M0 877Q410 795 793 875T1600 855V1000H0Z" fill="#a4b2b3" opacity=".075" filter="url(#blur)"/>
+</svg>
