@@ -52,6 +52,26 @@ async function postgresTransaction<T>(uid:string,change:(player:Player)=>T):Prom
     await connection.query('COMMIT');return value;
   }catch(e){await connection.query('ROLLBACK');throw e;}finally{connection.release();}
 }
+/** Read existing progress without an UPDATE or row lock.
+ * Supabase transaction-pooler connections are relatively expensive on cold starts;
+ * a read-only GET must not pay for BEGIN + FOR UPDATE + UPDATE + COMMIT.
+ * First-time visitors are inserted once, while all reward mutations continue
+ * exclusively through transact()'s locked transaction.
+ */
+export async function loadPlayer(uid:string):Promise<Player> {
+  if(!remoteStore())return transact(uid,p=>p);
+  const db=pool();
+  const found=await db.query<{state:Player}>('SELECT state FROM tower_players WHERE id = $1',[uid]);
+  if(found.rows.length&&isPlayer(found.rows[0].state))return found.rows[0].state;
+  const created=await db.query<{state:Player}>(
+    'INSERT INTO tower_players (id, state) VALUES ($1, $2::jsonb) ON CONFLICT (id) DO NOTHING RETURNING state',
+    [uid,JSON.stringify(newPlayer())]
+  );
+  if(created.rows.length&&isPlayer(created.rows[0].state))return created.rows[0].state;
+  const concurrent=await db.query<{state:Player}>('SELECT state FROM tower_players WHERE id = $1',[uid]);
+  if(concurrent.rows.length&&isPlayer(concurrent.rows[0].state))return concurrent.rows[0].state;
+  throw new Error('Player record could not be read.');
+}
 /** The change callback must be synchronous, so the caller cannot escape the row lock. */
 export async function transact<T>(uid:string,change:(player:Player)=>T):Promise<T> {
   if(remoteStore())return postgresTransaction(uid,change);

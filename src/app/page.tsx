@@ -26,6 +26,8 @@ export default function Home(){
  const [practiceMode,setPracticeMode]=useState(false);
  const [busy,setBusy]=useState(false);
  const [error,setError]=useState('');
+ const [loadAttempt,setLoadAttempt]=useState(0);
+ const [loadingSlow,setLoadingSlow]=useState(false);
  const [spinning,setSpinning]=useState(false);
  const [wheelAngle,setWheelAngle]=useState(0);
  const [reveal,setReveal]=useState('');
@@ -44,7 +46,6 @@ export default function Home(){
  const finishWheel=useRef<(()=>void)|null>(null);
  const alive=useRef(true);
  useEffect(()=>{alive.current=true;setDemo(new URLSearchParams(window.location.search).get('demo')==='1');
-  fetch('/api/game',{cache:'no-store'}).then(async r=>{const d=await r.json();if(!r.ok)throw Error(d.error);if(alive.current)setState(d.state);}).catch(e=>{if(alive.current)setError(e.message);});
   try{
    const introSeen=sessionStorage.getItem('tower-v15-intro')==='seen';
    const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -55,6 +56,27 @@ export default function Home(){
   }catch{}
   return ()=>{alive.current=false;if(spinTimer.current)clearTimeout(spinTimer.current);if(introTimer.current)clearTimeout(introTimer.current);freeSpin.current?.cancel();freeSpin.current=null;finishWheel.current=null;};
  },[]);
+ // Loading progress may require a Supabase/Vercel cold start. Distinguish an
+ // in-flight request from a genuine failure, and make retry work in-place.
+ useEffect(()=>{
+  let active=true;
+  const controller=new AbortController();
+  setError('');
+  setLoadingSlow(false);
+  const slow=setTimeout(()=>{if(active)setLoadingSlow(true);},2500);
+  const deadline=setTimeout(()=>controller.abort(),18000);
+  void (async()=>{
+   try {
+    const response=await fetch('/api/game',{cache:'no-store',signal:controller.signal});
+    const data=await response.json() as {state?:PublicState;error?:string};
+    if(!response.ok||!data.state)throw new Error(data.error??'Unable to load your progress.');
+    if(active){setState(data.state);setLoadingSlow(false);}
+   }catch(e){
+    if(active)setError(controller.signal.aborted?'The tower took too long to respond. Please try again.':e instanceof Error?e.message:'Unable to load your progress.');
+   }finally{clearTimeout(slow);clearTimeout(deadline);}
+  })();
+  return ()=>{active=false;controller.abort();clearTimeout(slow);clearTimeout(deadline);};
+ },[loadAttempt]);
  // A tab left open across 00:00 UTC must not display yesterday's spins.
  // Reconcile only when idle, so a real wheel reveal is never interrupted.
  useEffect(()=>{
@@ -259,7 +281,7 @@ export default function Home(){
    <AudioControls musicEnabled={musicEnabled} sfxEnabled={sfxEnabled} audioError={audioError} resumeAvailable={resumeAvailable} toggleMusic={toggleMusic} toggleSfx={toggleSfx}/>
   <main className="main-shell">
   {error&&<div className="error-banner" role="alert"><span>{error}</span><button onClick={()=>setError('')}>Dismiss</button></div>}
-  {!state? <div className="loading-screen"><div className="loading-symbol">♜</div><p>{error?'The tower could not connect. Check your connection and try again.':'The tower is waking…'}</p><button className="outline-button" onClick={()=>window.location.reload()}>Try again</button></div> : <>
+  {!state? <div className="loading-screen" aria-live="polite"><div className="loading-symbol" aria-hidden="true">♜</div><p>{error?'The tower could not load your progress.':loadingSlow?'The tower is taking longer than usual…':'The tower is waking…'}</p>{error?<button className="outline-button" onClick={()=>setLoadAttempt(n=>n+1)}>Try again</button>:<><div className="loading-progress" aria-hidden="true"><span/></div><small>{loadingSlow?'Connecting to your saved progress. You can wait a moment.':'Restoring your daily trials…'}</small></>}</div> : <>
    {view==='home'&&<div className="home-screen">
     <div className="scene-eyebrow"><span className="dot"/> THE DAILY ASCENT <span className="scene-date">{dateLabel} · RESETS 00:00 UTC</span></div>
     <section className="hero-card"><div className="hero-text"><div className="mini-label"><span className="hero-rune">✧</span> CHAPTER {CHAPTERS.indexOf(chapter)+1} <span className="hero-dot">·</span> FLOOR {shownFloor.toString().padStart(2,'0')}</div><h1>{state.cleared?<>The gate <em>opens.</em></>:<>The tower <em>calls you.</em></>}</h1><p>{state.cleared?'The tower yields another secret. Above you, the next staircase waits in silence.':state.spins===0?'Beyond the gates, two trials guard your ascent. Spin the ancient wheel and face what awaits.':'One step closer to the heart of the tower. Finish today’s trials to unlock its secret.'}</p><div className="hero-chips"><span>✧ {chapter.name}</span><span>◎ {state.floorsCleared} {state.floorsCleared===1?'floor':'floors'} cleared</span></div></div><div className="hero-art"><div className="hero-art-scene" aria-hidden="true"/><div className="hero-art-glow" aria-hidden="true"/><button className="hero-story-hotspot" onClick={()=>navigate('story')} aria-label="Explore the tower Chronicle"><span aria-hidden="true">✧</span><small>THE CHRONICLE ↗</small></button><span className="hero-art-engraving" aria-hidden="true">THE ASCENT BEGINS</span></div></section>

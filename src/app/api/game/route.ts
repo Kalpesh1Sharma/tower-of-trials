@@ -2,7 +2,7 @@ import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { dayKey, publicState, type Player } from '@/lib/tower';
 import { applyGameAction, GameRuleError, type GameAction } from '@/lib/game-actions';
-import { secrets, transact } from '@/lib/store';
+import { loadPlayer, secrets, transact } from '@/lib/store';
 
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
@@ -27,7 +27,8 @@ function response(body:unknown,session:{token:string;newCookie:boolean},status=2
 export async function GET(request:NextRequest){
   try {
     const keys=await secrets();const session=identity(request,keys.session);const day=dayKey();
-    const state=await transact(session.uid,p=>publicState(p,day));
+    const player=await loadPlayer(session.uid);
+    const state=publicState(player,day);
     return response({state},session);
   }catch(e){console.error('Game GET:',e);return NextResponse.json({error:'Unable to load progress. Check database configuration.'},{status:500});}
 }

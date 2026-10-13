@@ -1,3 +1,10 @@
+## V1.6.2 — refresh resilience and Practice Hall alignment
+
+- Existing players' initial `GET /api/game` now reads progress without a PostgreSQL row lock or write. New players are still created once, while reward writes remain transactional.
+- Loading progress shows a real loading state, a slower-connection message after 2.5 seconds, and a retry button only after an error or an 18-second timeout. Retrying refreshes data without a full page reload.
+- Practice Hall buttons have consistent 48px touch targets and vertically centered labels at both phone and desktop widths. Desktop/tablet audio controls now scroll with the header instead of floating over game cards.
+- No changes to rewards, wheel selection, artwork, or database schema.
+
 > **Responsiveness hotfix (V1.6.1):** The daily wheel now begins spinning immediately when clicked, even while the server assigns a game. Once the server replies, the wheel smoothly decelerates and reveals ONLY the server-selected trial after landing. Game submissions immediately show “Checking your answer…” while the server verifies the result; XP/success remain server-authoritative. This patch does not change puzzle content, XP, stories, daily limits, or the frozen V1.5 UI. No new environment variables or database migration.
 
 > **Production readiness update (V1.6):** UI remains frozen at V1.5. Added daily API workflow tests, structured rule-error handling, automatic UTC-day refresh while idle, a safe deployment smoke test, and Supabase RLS protections. See [production checklist](docs/production-checklist.md). Run `npm run smoke -- https://YOUR_DEPLOYMENT_URL` after deploying. The full Next.js build and real Postgres integration must still be verified on your machine.
