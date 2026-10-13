@@ -18,7 +18,8 @@ export default function GameStage({trial,practice,pending,onSubmit,onRetry,onPra
  return <section className="trial-page" aria-label={meta.name}>
   <div className="trail-nav"><button className="text-button" onClick={onBack}>← {practice?'Practice Hall':'Back to tower'}</button><span className="pill">{practice?'PRACTICE · NO XP':`ATTEMPT ${trial.attempt} OF 3`}</span></div>
   <div className="trial-heading"><div className="trial-glyph" aria-hidden="true">{meta.glyph}</div><div><div className="eyebrow">{meta.skill} TRIAL</div><h1>{meta.name}</h1><p>{INSTRUCTIONS[trial.game]}</p></div></div>
-  <div className="game-panel">
+  <div className={`game-panel ${pending?'game-panel-pending':''}`} aria-busy={pending}>
+   {pending&&<div className="trial-verify-strip" role="status" aria-live="polite"><span className="trial-verify-spinner" aria-hidden="true"/><div><strong>{trial.status==='active'?'Checking your answer…':'Preparing your next puzzle…'}</strong><small>The tower is verifying your trial.</small></div></div>}
    {trial.status==='active' ? <>
     {trial.puzzle.kind==='cipher'&&<Cipher key={trial.attempt} puzzle={trial.puzzle} pending={pending} onSubmit={onSubmit}/>}
     {trial.puzzle.kind==='ghost'&&<Ghost key={trial.attempt} puzzle={trial.puzzle} pending={pending} onSubmit={onSubmit}/>}

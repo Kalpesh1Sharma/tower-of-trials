@@ -5,6 +5,7 @@ import AudioControls from '@/components/AudioControls';
 import TowerEnding from '@/components/TowerEnding';
 import {useTowerAudio} from '@/hooks/useTowerAudio';
 import {endingForFloor,storyTitleForFloor} from '@/lib/story';
+import {alignedVisibleAngle,targetAngle} from '@/lib/wheel-motion';
 import { CHAPTERS, GAME_META, GAMES, chapterFor, type GameId, type PublicState, type PublicTrial } from '@/lib/tower';
 
 type View='home'|'trial'|'practice'|'story';
@@ -37,6 +38,8 @@ export default function Home(){
  const introTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const {musicEnabled,sfxEnabled,audioError,resumeAvailable,toggleMusic,toggleSfx,playSfx}=useTowerAudio();
  const spinLock=useRef(false);
+ const wheelNode=useRef<HTMLDivElement|null>(null);
+ const freeSpin=useRef<Animation|null>(null);
  const spinTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const finishWheel=useRef<(()=>void)|null>(null);
  const alive=useRef(true);
@@ -50,7 +53,7 @@ export default function Home(){
     introTimer.current=setTimeout(()=>{if(alive.current){setShowIntro(false);try{sessionStorage.setItem('tower-v15-intro','seen');}catch{}}},3100);
    }
   }catch{}
-  return ()=>{alive.current=false;if(spinTimer.current)clearTimeout(spinTimer.current);if(introTimer.current)clearTimeout(introTimer.current);finishWheel.current=null;};
+  return ()=>{alive.current=false;if(spinTimer.current)clearTimeout(spinTimer.current);if(introTimer.current)clearTimeout(introTimer.current);freeSpin.current?.cancel();freeSpin.current=null;finishWheel.current=null;};
  },[]);
  // A tab left open across 00:00 UTC must not display yesterday's spins.
  // Reconcile only when idle, so a real wheel reveal is never interrupted.
@@ -97,16 +100,53 @@ export default function Home(){
   finishWheel.current=null;
   if(alive.current)callback?.();
  },[]);
- const animateTo=useCallback((game:GameId,afterSpin:()=>void)=>{
-  const index=GAMES.indexOf(game);
-  const aim=-index*60;
+ // The wheel starts turning from the click, independently of the server request.
+ // Its final segment is *never* chosen on the client: only the server response
+ // determines where the wheel stops. Keep the visible angle when decelerating.
+ const startFreeSpin=()=>{
+  const node=wheelNode.current;
+  if(!node||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  freeSpin.current?.cancel();
+  if(typeof node.animate==='function'){
+   freeSpin.current=node.animate(
+    [{transform:`rotate(${wheelAngle}deg)`},{transform:`rotate(${wheelAngle+360}deg)`}],
+    {duration:850,iterations:Infinity,easing:'linear'}
+   );
+  }
+ };
+ const stopFreeSpin=():number=>{
+  const node=wheelNode.current;
+  let angle=wheelAngle;
+  if(node&&freeSpin.current){
+   try {
+    const matrix=new DOMMatrixReadOnly(getComputedStyle(node).transform);
+    angle=alignedVisibleAngle(wheelAngle,Math.atan2(matrix.b,matrix.a)*180/Math.PI);
+   }catch {/* In older browsers, fall back to the previous wheel angle. */}
+  }
+  freeSpin.current?.cancel();freeSpin.current=null;
+  if(node){
+   node.style.setProperty('transition','none','important');
+   node.style.transform=`rotate(${angle}deg)`;
+   // Commit the visible frame before beginning the deceleration transition.
+   void node.offsetWidth;
+  }
+  return angle;
+ };
+ const animateTo=(game:GameId,afterSpin:()=>void)=>{
+  const start=stopFreeSpin();
+  const target=targetAngle(start,GAMES.indexOf(game));
   finishWheel.current=afterSpin;
-  setWheelAngle(old=>Math.ceil((old-aim)/360)*360+aim+1800);
-  const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // The actual transitionend reveals the result. The timeout is only a fallback
-  // for reduced motion or environments which don't deliver transition events.
-  spinTimer.current=setTimeout(completeWheel,reducedMotion?120:3200);
- },[completeWheel]);
+  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const node=wheelNode.current;
+  if(node){
+   node.style.setProperty('transition',reduced?'none':'transform 1.65s cubic-bezier(.11,.81,.17,1), filter .22s ease','important');
+   node.style.transform=`rotate(${target}deg)`;
+  }
+  setWheelAngle(target);
+  // Transition-end is the normal success path. A timeout covers background
+  // tabs, disabled animations and browsers that omit the transition event.
+  spinTimer.current=setTimeout(completeWheel,reduced?120:1950);
+ };
  const onWheelTransitionEnd=(event:TransitionEvent<HTMLDivElement>)=>{
   if(event.currentTarget===event.target&&event.propertyName==='transform'&&finishWheel.current)completeWheel();
  };
@@ -117,6 +157,7 @@ export default function Home(){
   setSpinning(true);
   setPreviewGame(null);
   setReveal('');
+  startFreeSpin();
   try {
    const updated=await post({action:'spin'},false);
    const trial=updated.games.at(-1);
@@ -128,13 +169,14 @@ export default function Home(){
     playSfx('land');
     spinLock.current=false;
    });
-  }catch{spinLock.current=false;setSpinning(false);}
+  }catch{stopFreeSpin();spinLock.current=false;setSpinning(false);}
  };
  const previewSpin=()=>{
   if(!demo||spinning||busy||spinLock.current)return;
   spinLock.current=true;
   playSfx('spinStart');
   setSpinning(true);setReveal('');setPreviewGame(null);
+  startFreeSpin();
   // Reviewer-only animation; no POST, reward or change to daily progress.
   const game=GAMES[Math.floor(Math.random()*GAMES.length)];
   animateTo(game,()=>{
@@ -223,10 +265,10 @@ export default function Home(){
     <section className="hero-card"><div className="hero-text"><div className="mini-label"><span className="hero-rune">✧</span> CHAPTER {CHAPTERS.indexOf(chapter)+1} <span className="hero-dot">·</span> FLOOR {shownFloor.toString().padStart(2,'0')}</div><h1>{state.cleared?<>The gate <em>opens.</em></>:<>The tower <em>calls you.</em></>}</h1><p>{state.cleared?'The tower yields another secret. Above you, the next staircase waits in silence.':state.spins===0?'Beyond the gates, two trials guard your ascent. Spin the ancient wheel and face what awaits.':'One step closer to the heart of the tower. Finish today’s trials to unlock its secret.'}</p><div className="hero-chips"><span>✧ {chapter.name}</span><span>◎ {state.floorsCleared} {state.floorsCleared===1?'floor':'floors'} cleared</span></div></div><div className="hero-art"><div className="hero-art-scene" aria-hidden="true"/><div className="hero-art-glow" aria-hidden="true"/><button className="hero-story-hotspot" onClick={()=>navigate('story')} aria-label="Explore the tower Chronicle"><span aria-hidden="true">✧</span><small>THE CHRONICLE ↗</small></button><span className="hero-art-engraving" aria-hidden="true">THE ASCENT BEGINS</span></div></section>
     <div className="dashboard-grid"><section className="wheel-card"><div className="section-top"><div><div className="eyebrow">THE ORACLE WHEEL</div><h2>A trial awaits.</h2></div><span className="small-tag">{Math.max(0,2-state.spins)} SPINS LEFT</span></div>
       <p className="wheel-intro">A turn of fate reveals the next guardian.</p>
-      <div className="wheel-area"><div className="altar-torch altar-torch-left" aria-hidden="true"/><div className="altar-torch altar-torch-right" aria-hidden="true"/><div className="wheel-pointer" aria-hidden="true"/><div className={`wheel ${spinning?'spinning':''}`} onTransitionEnd={onWheelTransitionEnd} style={{transform:`rotate(${wheelAngle}deg)`}} aria-label="Wheel with six games">
+      <div className="wheel-area"><div className="altar-torch altar-torch-left" aria-hidden="true"/><div className="altar-torch altar-torch-right" aria-hidden="true"/><div className="wheel-pointer" aria-hidden="true"/><div className={`wheel ${spinning?'spinning':''}`} ref={wheelNode} onTransitionEnd={onWheelTransitionEnd} style={{transform:`rotate(${wheelAngle}deg)`}} aria-label="Wheel with six games">
       {GAMES.map((g,i)=><div key={g} className="wheel-segment-label" style={{transform:`rotate(${i*60}deg) translateY(var(--label-shift)) rotate(${-i*60}deg)`}}><span>{GAME_META[g].glyph}</span><small>{GAME_META[g].name.split(' ')[0]}</small></div>)}<div className="wheel-hub">✧</div>
       </div></div>
-      {spinning?<div className="status-panel" role="status">{busy?'Preparing your trial…':'The wheel is turning…'}</div>:reveal?<div className="result-preview" role="status"><span>{previewGame?'PRACTICE PREVIEW · NO XP':'TRIAL REVEALED'}</span><strong>{reveal}</strong><p>{reveal?TRIAL_DESCRIPTIONS[previewGame??latest?.game??'cipher']:''}</p><button className="action-button" onClick={()=>previewGame?void practice(previewGame):playLatest()}>{previewGame?'Practice this game →':'Enter trial →'}</button></div>:state.cleared?<div className="result-preview cleared-preview"><span>FLOOR {shownFloor} CLEARED ✧</span><strong>The gate opens.</strong><p>A hidden staircase rises from the shadows. Floor {state.floor} awaits tomorrow.</p><button className="outline-button" onClick={showReplay}>Replay ending · Read your story fragment ↗</button></div>:<>
+      {spinning?<div className="status-panel" role="status">{busy?'The wheel is choosing your trial…':'The wheel is slowing down…'}</div>:reveal?<div className="result-preview" role="status"><span>{previewGame?'PRACTICE PREVIEW · NO XP':'TRIAL REVEALED'}</span><strong>{reveal}</strong><p>{reveal?TRIAL_DESCRIPTIONS[previewGame??latest?.game??'cipher']:''}</p><button className="action-button" onClick={()=>previewGame?void practice(previewGame):playLatest()}>{previewGame?'Practice this game →':'Enter trial →'}</button></div>:state.cleared?<div className="result-preview cleared-preview"><span>FLOOR {shownFloor} CLEARED ✧</span><strong>The gate opens.</strong><p>A hidden staircase rises from the shadows. Floor {state.floor} awaits tomorrow.</p><button className="outline-button" onClick={showReplay}>Replay ending · Read your story fragment ↗</button></div>:<>
        {canSpin?<button className="action-button full" onClick={spin} disabled={busy}>Spin the Wheel of Fate <span>✧</span></button>:
         latest?.status==='active'||latest?.status==='retry'?<button className="action-button full" onClick={playLatest}>Continue {GAME_META[latest.game].name} <span>→</span></button>:
         state.spins===2?<div className="status-panel"><strong>The tower rests for today.</strong><p>Your cleared floors are safe. Return after the daily reset to try again.</p></div>:<div className="status-panel">Your first trial must finish before spin two.</div>}

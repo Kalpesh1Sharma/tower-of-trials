@@ -206,3 +206,13 @@ body{background:#06121f}
 @media(prefers-reduced-motion:reduce){
  .hero-art-scene,.hero-art-glow,.altar-torch::before{animation:none!important;transition:none!important}
 }
+
+/* V1.6.1: immediate confirmation of input while server verification runs.
+   The client deliberately does not display victory or grant points optimistically. */
+.trial-verify-strip{display:flex;align-items:center;gap:12px;margin:0 0 15px;padding:12px 14px;border:1px solid #bda06a91;border-radius:11px;background:#1d3245ec;color:#f6e2b6;box-shadow:0 0 20px #e7c17c13}
+.trial-verify-strip div{display:flex;flex-direction:column;gap:2px}
+.trial-verify-strip strong{font-size:13px;line-height:1.35}
+.trial-verify-strip small{font-size:11px;color:#d0d8df}
+.trial-verify-spinner{display:block;flex:none;width:23px;height:23px;border-radius:50%;border:2px solid #efd0934a;border-top-color:#f4d28f;animation:trialVerifySpin .7s linear infinite}
+@keyframes trialVerifySpin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.trial-verify-spinner{animation:none;border-top-color:#f4d28f}}

@@ -1,3 +1,5 @@
+> **Responsiveness hotfix (V1.6.1):** The daily wheel now begins spinning immediately when clicked, even while the server assigns a game. Once the server replies, the wheel smoothly decelerates and reveals ONLY the server-selected trial after landing. Game submissions immediately show “Checking your answer…” while the server verifies the result; XP/success remain server-authoritative. This patch does not change puzzle content, XP, stories, daily limits, or the frozen V1.5 UI. No new environment variables or database migration.
+
 > **Production readiness update (V1.6):** UI remains frozen at V1.5. Added daily API workflow tests, structured rule-error handling, automatic UTC-day refresh while idle, a safe deployment smoke test, and Supabase RLS protections. See [production checklist](docs/production-checklist.md). Run `npm run smoke -- https://YOUR_DEPLOYMENT_URL` after deploying. The full Next.js build and real Postgres integration must still be verified on your machine.
 
 ## V1.5 — Cinematic Castle World (current release)
